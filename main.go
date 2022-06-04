@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
 )
 
 type Number struct {
@@ -148,8 +147,6 @@ const (
 func main() {
 
 	e := echo.New()
-
-	e.Use(middleware.Logger())
 
 	numberRestMap := new(PhonenumberMap)
 
