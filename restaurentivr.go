@@ -74,11 +74,13 @@ func (rivr RestaurentIVR) CreateWelcomeVoiceBot(gatherSayString string) *Respons
 		VoiceMode:        "stream",
 		VoiceAckSay:      string(out),
 	}
+
 	resp.Gather.Say = &Say{
 		Text:     gatherSayString,
 		Voice:    "Microsoft",
 		TextType: "ssml",
 	}
+
 	resp.Say = &Say{
 		Text: "We didn't receive any input. Goodbye!",
 	}
@@ -86,18 +88,6 @@ func (rivr RestaurentIVR) CreateWelcomeVoiceBot(gatherSayString string) *Respons
 	outGather, _ := xml.MarshalIndent(resp, " ", "  ")
 	fmt.Println(string(outGather))
 
-	return resp
-}
-
-func (rivr RestaurentIVR) CreateSayHangupSSML(sayString string) *Response {
-	resp := &Response{}
-	resp.Text = ""
-	resp.Say = &Say{
-		Text:     sayString,
-		Voice:    "Microsoft",
-		TextType: "ssml",
-	}
-	resp.Hangup = &Hangup{}
 	return resp
 }
 
