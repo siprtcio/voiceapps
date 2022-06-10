@@ -156,29 +156,10 @@ func main() {
 		return c.String(http.StatusOK, "Healthy!!!")
 	})
 
-	e.POST("/SiprtcApplications/DirectCall", func(c echo.Context) error {
-		resp := &Response{}
-		resp.Text = ""
-		u := StatusCallback{}
-		err := c.Bind(&u)
-		if err != nil {
-			rejectresp := &Response{}
-			rejectresp.Reject = &Reject{
-				Reason: "rejected",
-			}
-			return c.XML(http.StatusOK, resp)
-		}
-		resp.Dial = &Dial{
-			AnswerOnBridge: true,
-			Number: &Number{
-				Text: u.To,
-			},
-		}
-		return c.XML(http.StatusOK, resp)
-	})
+	e.POST("/SiprtcApplications/VoxvellyDemo", VoxvellyDemo)
+	e.POST("/SiprtcApplications/VoxvellyDemoDtmfReceived", VoxvellyDemoDtmfReceived)
 
-	// from number : customer number
-	// to number : inbound siprtc number.
+	e.POST("/SiprtcApplications/DirectCall", DirectCall)
 	e.GET("/SiprtcApplications/MainRestaurantMenu", func(c echo.Context) error {
 		u := StatusCallback{}
 		err := c.Bind(&u)
@@ -190,6 +171,7 @@ func main() {
 			return c.XML(http.StatusOK, rejectresp)
 		}
 		ivrRest := new(RestaurentIVR)
+		ivrRest.InitRestaurentIVR()
 		numberRestMap.StoreNumberInstance(u.From, ivrRest)
 		resp := ivrRest.GetMainMenuResponse()
 		return c.XML(http.StatusOK, resp)
