@@ -88,6 +88,7 @@ type Hangup struct {
 	XMLName xml.Name `xml:"Hangup"`
 	Text    string   `xml:",chardata"`
 }
+
 type Response struct {
 	XMLName  xml.Name  `xml:"Response"`
 	Text     string    `xml:",chardata"`
@@ -139,7 +140,6 @@ func CreateSayDial(sayText string, dialNumber string, callerID string) *Response
 	resp.Say = &Say{
 		Text: sayText,
 	}
-
 	resp.Dial = &Dial{}
 	resp.Dial.Text = dialNumber
 	resp.Dial.CallerId = callerID
