@@ -66,9 +66,9 @@ func VoxvellyDemoDtmfReceived(c echo.Context) error {
 	}
 
 	if u.Digits == "1" {
-		resp = CreateSayDial("Forwarding call to sales", "919945073606", "917901629776")
+		resp = CreateSayDial("Forwarding call to sales", "919945073606", "+917901629776")
 	} else {
-		resp = CreateSayDial("Forwarding call to support", "919036950678", "917901629776")
+		resp = CreateSayDial("Forwarding call to support", "919036950678", "+917901629776")
 	}
 
 	return c.XML(http.StatusOK, resp)
