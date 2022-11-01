@@ -117,6 +117,10 @@ func VoicebotUserIntent(c echo.Context) error {
 		fmt.Println("complain")
 		ssmlText := prefix + `Let me help you in raising complain. Please speak out for next 5 minute, your audio is recorded and on priority your complaing would be analysed and resolved.` + postfix
 		resp = ivrRest.CreateWelcomeVoiceBot(ssmlText)
+	case "cancel_booking":
+		fmt.Println("complain")
+		ssmlText := prefix + `Let me help you in cancelling reservation. As i can see your current reservation is there. I am cancelling now and you will get sms for the same. Thanks for your time..` + postfix
+		resp = CreateSayHangupSSML(ssmlText)
 	case "booking":
 		fmt.Println("booking")
 		ssmlText := prefix + `I can help you with booking of table, For how many persons do you need reservation?` + postfix

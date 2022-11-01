@@ -71,7 +71,7 @@ func (rivr RestaurentIVR) CreateWelcomeVoiceBot(gatherSayString string) *Respons
 		VoiceMaxDuration: "10000",
 		VoicePreSilence:  "5000",
 		VoicePostSilence: "1000",
-		VoiceMode:        "stream",
+		VoiceMode:        "buffer",
 		VoiceAckSay:      string(out),
 	}
 
