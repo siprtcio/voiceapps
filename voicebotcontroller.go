@@ -94,12 +94,12 @@ func VoicebotUserIntent(c echo.Context) error {
 
 	fmt.Println(userIntent)
 
-	textlength := len(userIntent.Text)
-
 	prefix := `<speak xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="http://www.w3.org/2001/mstts" xmlns:emo="http://www.w3.org/2009/10/emotionml" version="1.0" xml:lang="en-US"><voice name="en-IN-NeerjaNeural"><prosody rate="0%" pitch="0%">`
 	postfix := `</prosody></voice></speak>`
 
-	if textlength == 0 {
+	textlength := len(userIntent.Text)
+
+	if textlength == 0 || userIntent.Intent.Confidence < 0.85 {
 		userIntent.Intent.Name = "nlu_fallback"
 	}
 
