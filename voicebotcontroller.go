@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo"
 )
@@ -143,6 +144,20 @@ func VoicebotUserIntent(c echo.Context) error {
 		}
 	case "booking_with_count_time":
 		fmt.Println("booking_with_count_time")
+		ssmlText := ""
+		if userIntent.Entities[0].Entity == "time" {
+			fmt.Println("time of booking : ", userIntent.Entities[0].Value)
+			ivrRest.SetDayTime(userIntent.Entities[0].Text)
+			ssmlText = prefix + `I would like to confirm that you need booking ` + userIntent.Entities[0].Text
+		}
+		if userIntent.Entities[0].Entity == "number" {
+			fmt.Println("number of persongs : ", userIntent.Entities[0].Value)
+			// ask for what time today or tomorrow?
+			ivrRest.SetCount(userIntent.Entities[0].Value)
+			ssmlText = ssmlText + `for ` + strconv.Itoa(userIntent.Entities[0].Value) + `people`
+		}
+		ssmlText = ssmlText + `What time do you need booking? you can say like 9:30PM or 10:30AM.`
+		resp = ivrRest.CreateWelcomeVoiceBot(ssmlText)
 		// ask for the
 	case "booking_time_day":
 		fmt.Println("booking_time_day")
@@ -159,6 +174,7 @@ func VoicebotUserIntent(c echo.Context) error {
 			fmt.Println("time of booking : ", userIntent.Entities[0].Text, userIntent.Entities[0].Value)
 			// ask for the time of today or tomorrow?
 			ssmlText := prefix + `Ok i will do booking ` + userIntent.Entities[0].Text + ` for you.` + postfix
+			ivrRest.SetDayTime(userIntent.Entities[0].Text)
 			resp = ivrRest.CreateWelcomeVoiceBot(ssmlText)
 		}
 	case "booking_with_count_time_day_hours_minute":

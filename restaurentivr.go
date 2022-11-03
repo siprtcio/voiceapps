@@ -24,6 +24,16 @@ func (rivr *RestaurentIVR) InitRestaurentIVR() {
 	rivr.actionURL = "https://demo.siprtc.io/SiprtcApplications/DtmfReceived"
 }
 
+func (rivr *RestaurentIVR) IsBookingConfirm() int {
+	if rivr.GetCount() == 0 {
+		return 1
+	}
+	if rivr.bookingdate.Hour() == 0 {
+		return 2
+	}
+	return 0
+}
+
 func (rivr *RestaurentIVR) SetCount(count int) {
 	rivr.count = count
 }
