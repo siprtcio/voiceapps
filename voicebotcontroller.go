@@ -82,7 +82,10 @@ func ProcessUserIntent(uIntent string) UserIntent {
 	fmt.Println(string(data))
 	// decode it to json
 	var userIntent UserIntent
-	json.Unmarshal(data, &userIntent)
+	err = json.Unmarshal(data, &userIntent)
+	if err != nil {
+		fmt.Println(err)
+	}
 	// parse json and get the intent
 	fmt.Println(userIntent.Text, userIntent.Intent.Name)
 	// process intent.
@@ -174,50 +177,70 @@ func VoicebotUserIntent(c echo.Context) error {
 		resp = ivrRest.CreateWelcomeVoiceBot(ssmlText)
 	case "booking_with_count":
 		fmt.Println("booking_with_count")
-		if userIntent.Entities[0].Entity == "number" {
-			fmt.Println("number of persongs : ", userIntent.Entities[0].Value)
-			// ask for what time today or tomorrow?
-			count, _, _, _ := stringOrIntOrStruct(userIntent.Entities[0].Value)
-			ivrRest.SetCount(count)
-			ssmlText := prefix + `I would like to confirm that you need booking for ` + userIntent.Entities[0].Text + `, and do you need booking today, tomorrow or day after tomorrow?` + postfix
-			resp = ivrRest.CreateWelcomeVoiceBot(ssmlText)
+		ssmlText := ""
+		if len(userIntent.Entities) == 0 {
+			ssmlText = prefix + `I'm sorry, But looks like you are trying to say number of person visiting us, I don't understand, can you please say that again?` + postfix
+		} else {
+			if userIntent.Entities[0].Entity == "number" {
+				fmt.Println("number of persongs : ", userIntent.Entities[0].Value)
+				// ask for what time today or tomorrow?
+				count, _, _, _ := stringOrIntOrStruct(userIntent.Entities[0].Value)
+				ivrRest.SetCount(count)
+				ssmlText = prefix + `I would like to confirm that you need booking for ` + userIntent.Entities[0].Text + `, and do you need booking today, tomorrow or day after tomorrow?` + postfix
+			}
 		}
+		resp = ivrRest.CreateWelcomeVoiceBot(ssmlText)
+
 	case "booking_with_count_time":
 		fmt.Println("booking_with_count_time")
 		ssmlText := ""
-		for i := 0; i < len(userIntent.Entities); i++ {
-			if userIntent.Entities[0].Entity == "time" {
-				fmt.Println("time of booking : ", userIntent.Entities[0].Text, userIntent.Entities[0].Value)
-				ivrRest.SetDayTime(userIntent.Entities[0].Text)
-				ssmlText = prefix + `I would like to confirm that you need booking ` + userIntent.Entities[0].Text
-			} else if userIntent.Entities[0].Entity == "number" {
-				count, _, _, _ := stringOrIntOrStruct(userIntent.Entities[0].Value)
-				fmt.Println("number of persongs : ", count)
-				ivrRest.SetCount(count)
-				ssmlText = ssmlText + `for ` + strconv.Itoa(count) + `people`
+		if len(userIntent.Entities) == 0 {
+			ssmlText = prefix + `I'm sorry, I don't understand, can you please say that again?` + postfix
+		} else {
+			for i := 0; i < len(userIntent.Entities); i++ {
+				if userIntent.Entities[0].Entity == "time" {
+					fmt.Println("time of booking : ", userIntent.Entities[0].Text, userIntent.Entities[0].Value)
+					ivrRest.SetDayTime(userIntent.Entities[0].Text)
+					ssmlText = prefix + `I would like to confirm that you need booking ` + userIntent.Entities[0].Text
+				} else if userIntent.Entities[0].Entity == "number" {
+					count, _, _, _ := stringOrIntOrStruct(userIntent.Entities[0].Value)
+					fmt.Println("number of persongs : ", count)
+					ivrRest.SetCount(count)
+					ssmlText = ssmlText + `for ` + strconv.Itoa(count) + `people`
+				}
 			}
+			ssmlText = ssmlText + `What time do you need booking? you can say like 9:30PM or 10:30AM.` + postfix
 		}
-		ssmlText = ssmlText + `What time do you need booking? you can say like 9:30PM or 10:30AM.`
 		resp = ivrRest.CreateWelcomeVoiceBot(ssmlText)
 		// ask for the
 	case "booking_time_day":
 		fmt.Println("booking_time_day")
-		if userIntent.Entities[0].Entity == "time" {
-			fmt.Println("time of booking : ", userIntent.Entities[0].Value)
-			ivrRest.SetDayTime(userIntent.Entities[0].Text)
-			ssmlText := prefix + `Ok i will do booking ` + userIntent.Entities[0].Text + ` for you, What time do you need booking? you can say like 9:30PM or 10:30AM.` + postfix
-			resp = ivrRest.CreateWelcomeVoiceBot(ssmlText)
+		ssmlText := ""
+		if len(userIntent.Entities) == 0 {
+			ssmlText = prefix + `I'm sorry, I don't understand time correctly, can you please say that again?` + postfix
+		} else {
+			if userIntent.Entities[0].Entity == "time" {
+				fmt.Println("time of booking : ", userIntent.Entities[0].Value)
+				ivrRest.SetDayTime(userIntent.Entities[0].Text)
+				ssmlText = prefix + `Ok i will do booking ` + userIntent.Entities[0].Text + ` for you, What time do you need booking? you can say like 9:30PM or 10:30AM.` + postfix
+			}
 		}
-		// ivrRest.CreateWelcomeVoiceBot(ssmlText)
+		resp = ivrRest.CreateWelcomeVoiceBot(ssmlText)
 	case "booking_with_time_day_hours_minute":
 		fmt.Println("booking_with_time_day_hours_minute")
-		if userIntent.Entities[0].Entity == "time" {
-			fmt.Println("time of booking : ", userIntent.Entities[0].Text, userIntent.Entities[0].Value)
-			// ask for the time of today or tomorrow?
-			ssmlText := prefix + `Ok i will do booking ` + userIntent.Entities[0].Text + ` for you.` + postfix
-			ivrRest.SetDayTime(userIntent.Entities[0].Text)
-			resp = ivrRest.CreateWelcomeVoiceBot(ssmlText)
+		ssmlText := ""
+		if len(userIntent.Entities) == 0 {
+			ssmlText = prefix + `I'm sorry, I don't understand time correctly, can you please say that again?` + postfix
+		} else {
+			if userIntent.Entities[0].Entity == "time" {
+				fmt.Println("time of booking : ", userIntent.Entities[0].Text, userIntent.Entities[0].Value)
+				// ask for the time of today or tomorrow?
+				ssmlText = prefix + `Ok i will do booking ` + userIntent.Entities[0].Text + ` for you.` + postfix
+				ivrRest.SetDayTime(userIntent.Entities[0].Text)
+			}
 		}
+		resp = ivrRest.CreateWelcomeVoiceBot(ssmlText)
+
 	case "booking_with_count_time_day_hours_minute":
 		fmt.Println("booking_with_count_time_day_hours_minute")
 		for i := 0; i < len(userIntent.Entities); i++ {
@@ -233,26 +256,38 @@ func VoicebotUserIntent(c echo.Context) error {
 
 	case "booking_count":
 		fmt.Println("booking_count")
-		if userIntent.Entities[0].Entity == "number" {
-			count, _, _, _ := stringOrIntOrStruct(userIntent.Entities[0].Value)
-			fmt.Println("number of persongs : ", count)
-			ivrRest.SetCount(count)
-			// ask for what time today or tomorrow?
-			ssmlText := prefix + `I would like to confirm that you need booking for ` + userIntent.Entities[0].Text + `, and do you need booking today, tomorrow or day after tomorrow?` + postfix
-			resp = ivrRest.CreateWelcomeVoiceBot(ssmlText)
+		ssmlText := ""
+		if len(userIntent.Entities) == 0 {
+			ssmlText = prefix + `I'm sorry, I don't understand, can you please say that again?` + postfix
+		} else {
+			if userIntent.Entities[0].Entity == "number" {
+				count, _, _, _ := stringOrIntOrStruct(userIntent.Entities[0].Value)
+				fmt.Println("number of persongs : ", count)
+				ivrRest.SetCount(count)
+				// ask for what time today or tomorrow?
+				ssmlText = prefix + `I would like to confirm that you need booking for ` + userIntent.Entities[0].Text + `, and do you need booking today, tomorrow or day after tomorrow?` + postfix
+			}
 		}
+		resp = ivrRest.CreateWelcomeVoiceBot(ssmlText)
+
 	case "booking_time":
 		fmt.Println("booking_time")
-		if userIntent.Entities[0].Entity == "time" {
-			_, bookingTime, bookingTimeStruct, valType := stringOrIntOrStruct(userIntent.Entities[0].Value)
-			if valType == VAL_STRING {
-				ivrRest.SetDayTime(bookingTime)
-			} else {
-				ivrRest.SetBookingDayTime(bookingTimeStruct.From)
+		ssmlText := ""
+		if len(userIntent.Entities) == 0 {
+			ssmlText = prefix + `I'm sorry, I don't understand, can you please say that again?` + postfix
+		} else {
+			if userIntent.Entities[0].Entity == "time" {
+				_, bookingTime, bookingTimeStruct, valType := stringOrIntOrStruct(userIntent.Entities[0].Value)
+				if valType == VAL_STRING {
+					ivrRest.SetDayTime(bookingTime)
+				} else {
+					ivrRest.SetBookingDayTime(bookingTimeStruct.From)
+				}
+				ssmlText = prefix + `I confirm your booking ` + userIntent.Entities[0].Text + `, and do you will get sms for confirmation of booking.` + postfix
 			}
-			ssmlText := prefix + `I confirm your booking ` + userIntent.Entities[0].Text + `, and do you will get sms for confirmation of booking.` + postfix
-			resp = ivrRest.CreateWelcomeVoiceBot(ssmlText)
 		}
+		resp = ivrRest.CreateWelcomeVoiceBot(ssmlText)
+
 	case "talkto_agent":
 		fmt.Println("talkto_agent")
 		ssmlText := prefix + `Ok , Let me transfer your call to an agent. Transferring call now.` + postfix
