@@ -225,6 +225,10 @@ func VoicebotUserIntent(c echo.Context) error {
 				ssmlText = prefix + `Ok i will do booking ` + userIntent.Entities[0].Text + ` for you, What time do you need booking? you can say like 9:30PM or 10:30AM.` + postfix
 			}
 		}
+
+		if len(ssmlText) == 0 {
+			ssmlText = prefix + `I'm sorry, I don't understand, can you please say that again?` + postfix
+		}
 		resp = ivrRest.CreateWelcomeVoiceBot(ssmlText)
 	case "booking_with_time_day_hours_minute":
 		fmt.Println("booking_with_time_day_hours_minute")
@@ -266,7 +270,13 @@ func VoicebotUserIntent(c echo.Context) error {
 				ivrRest.SetCount(count)
 				// ask for what time today or tomorrow?
 				ssmlText = prefix + `I would like to confirm that you need booking for ` + userIntent.Entities[0].Text + `, and do you need booking today, tomorrow or day after tomorrow?` + postfix
+			} else {
+				ssmlText = prefix + `I'm sorry, I don't understand, can you please say that again?` + postfix
 			}
+		}
+
+		if len(ssmlText) == 0 {
+			ssmlText = prefix + `I'm sorry, I don't understand, can you please say that again?` + postfix
 		}
 		resp = ivrRest.CreateWelcomeVoiceBot(ssmlText)
 
@@ -285,6 +295,10 @@ func VoicebotUserIntent(c echo.Context) error {
 				}
 				ssmlText = prefix + `I confirm your booking ` + userIntent.Entities[0].Text + `, and do you will get sms for confirmation of booking.` + postfix
 			}
+		}
+
+		if len(ssmlText) == 0 {
+			ssmlText = prefix + `I'm sorry, I don't understand, can you please say that again?` + postfix
 		}
 		resp = ivrRest.CreateWelcomeVoiceBot(ssmlText)
 
