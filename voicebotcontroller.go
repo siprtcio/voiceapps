@@ -28,7 +28,7 @@ type Entities struct {
 	End        int             `json:"end"`
 	Text       string          `json:"text"`
 	Value      json.RawMessage `json:"value"`
-	Confidence int             `json:"confidence"`
+	Confidence float32         `json:"confidence"`
 	Entity     string          `json:"entity"`
 }
 type IntentRanking struct {
