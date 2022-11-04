@@ -56,6 +56,11 @@ func (rivr *RestaurentIVR) SetDayTime(dayTime string) error {
 	return err
 }
 
+func (rivr *RestaurentIVR) SetBookingDayTime(dayTime time.Time) error {
+	rivr.bookingdate = dayTime
+	return nil
+}
+
 func (rivr *RestaurentIVR) SetTime(hour int, minute int) {
 	rivr.bookingdate = time.Date(rivr.bookingdate.Year(),
 		rivr.bookingdate.Month(), rivr.bookingdate.Day(), hour, minute, 0, 0, time.Now().Local().Location())

@@ -7,6 +7,8 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
+	"unicode/utf8"
 
 	"github.com/labstack/echo"
 )
@@ -22,16 +24,59 @@ type Intent struct {
 	Confidence float64 `json:"confidence"`
 }
 type Entities struct {
-	Start      int    `json:"start"`
-	End        int    `json:"end"`
-	Text       string `json:"text"`
-	Value      int    `json:"value"`
-	Confidence int    `json:"confidence"`
-	Entity     string `json:"entity"`
+	Start      int             `json:"start"`
+	End        int             `json:"end"`
+	Text       string          `json:"text"`
+	Value      json.RawMessage `json:"value"`
+	Confidence int             `json:"confidence"`
+	Entity     string          `json:"entity"`
 }
 type IntentRanking struct {
 	Name       string  `json:"name"`
 	Confidence float64 `json:"confidence"`
+}
+
+type ValueType int64
+
+const (
+	VAL_INVALID ValueType = 0
+	VAL_INT               = 1
+	VAL_STRING            = 2
+	VAL_STRUCT            = 3
+)
+
+type ValueStruct struct {
+	To   time.Time `json:"to"`
+	From time.Time `json:"from"`
+}
+
+func stringOrIntOrStruct(bytes []byte) (int, string, *ValueStruct, ValueType) {
+	var p Entities
+	err := json.Unmarshal(bytes, &p)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if utf8.Valid(p.Value) {
+		i, err := strconv.Atoi(string(p.Value))
+		if err == nil {
+			fmt.Println("got int: " + strconv.Itoa(i))
+			return i, "", nil, VAL_INT
+		} else {
+			valStruct := ValueStruct{}
+			err := json.Unmarshal(p.Value, &valStruct)
+			if err != nil {
+				fmt.Println("got string", string(p.Value))
+				return 0, string(p.Value), nil, VAL_STRING
+			} else {
+				fmt.Println("got struct", valStruct)
+				return 0, "", &valStruct, VAL_STRUCT
+			}
+		}
+	} else {
+		fmt.Println("whoops")
+	}
+	return 0, "", nil, VAL_INVALID
 }
 
 func ProcessUserIntent(uIntent string) UserIntent {
@@ -138,7 +183,8 @@ func VoicebotUserIntent(c echo.Context) error {
 		if userIntent.Entities[0].Entity == "number" {
 			fmt.Println("number of persongs : ", userIntent.Entities[0].Value)
 			// ask for what time today or tomorrow?
-			ivrRest.SetCount(userIntent.Entities[0].Value)
+			count, _, _, _ := stringOrIntOrStruct(userIntent.Entities[0].Value)
+			ivrRest.SetCount(count)
 			ssmlText := prefix + `I would like to confirm that you need booking for ` + userIntent.Entities[0].Text + `, and do you need booking today, tomorrow or day after tomorrow?` + postfix
 			resp = ivrRest.CreateWelcomeVoiceBot(ssmlText)
 		}
@@ -151,9 +197,10 @@ func VoicebotUserIntent(c echo.Context) error {
 				ivrRest.SetDayTime(userIntent.Entities[0].Text)
 				ssmlText = prefix + `I would like to confirm that you need booking ` + userIntent.Entities[0].Text
 			} else if userIntent.Entities[0].Entity == "number" {
-				fmt.Println("number of persongs : ", userIntent.Entities[0].Value)
-				ivrRest.SetCount(userIntent.Entities[0].Value)
-				ssmlText = ssmlText + `for ` + strconv.Itoa(userIntent.Entities[0].Value) + `people`
+				count, _, _, _ := stringOrIntOrStruct(userIntent.Entities[0].Value)
+				fmt.Println("number of persongs : ", count)
+				ivrRest.SetCount(count)
+				ssmlText = ssmlText + `for ` + strconv.Itoa(count) + `people`
 			}
 		}
 		ssmlText = ssmlText + `What time do you need booking? you can say like 9:30PM or 10:30AM.`
@@ -193,8 +240,9 @@ func VoicebotUserIntent(c echo.Context) error {
 	case "booking_count":
 		fmt.Println("booking_count")
 		if userIntent.Entities[0].Entity == "number" {
-			fmt.Println("number of persongs : ", userIntent.Entities[0].Value)
-			ivrRest.SetCount(userIntent.Entities[0].Value)
+			count, _, _, _ := stringOrIntOrStruct(userIntent.Entities[0].Value)
+			fmt.Println("number of persongs : ", count)
+			ivrRest.SetCount(count)
 			// ask for what time today or tomorrow?
 			ssmlText := prefix + `I would like to confirm that you need booking for ` + userIntent.Entities[0].Text + `, and do you need booking today, tomorrow or day after tomorrow?` + postfix
 			resp = ivrRest.CreateWelcomeVoiceBot(ssmlText)
@@ -202,9 +250,12 @@ func VoicebotUserIntent(c echo.Context) error {
 	case "booking_time":
 		fmt.Println("booking_time")
 		if userIntent.Entities[0].Entity == "time" {
-			fmt.Println("booking_time : ", userIntent.Entities[0].Value)
-			ivrRest.SetCount(userIntent.Entities[0].Value)
-			// ask for what time today or tomorrow?
+			_, bookingTime, bookingTimeStruct, valType := stringOrIntOrStruct(userIntent.Entities[0].Value)
+			if valType == VAL_STRING {
+				ivrRest.SetDayTime(bookingTime)
+			} else {
+				ivrRest.SetBookingDayTime(bookingTimeStruct.From)
+			}
 			ssmlText := prefix + `I confirm your booking ` + userIntent.Entities[0].Text + `, and do you will get sms for confirmation of booking.` + postfix
 			resp = ivrRest.CreateWelcomeVoiceBot(ssmlText)
 		}
