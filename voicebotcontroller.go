@@ -50,24 +50,18 @@ type ValueStruct struct {
 	From time.Time `json:"from"`
 }
 
-func stringOrIntOrStruct(bytes []byte) (int, string, *ValueStruct, ValueType) {
-	var p Entities
-	err := json.Unmarshal(bytes, &p)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if utf8.Valid(p.Value) {
-		i, err := strconv.Atoi(string(p.Value))
+func stringOrIntOrStruct(Value []byte) (int, string, *ValueStruct, ValueType) {
+	if utf8.Valid(Value) {
+		i, err := strconv.Atoi(string(Value))
 		if err == nil {
 			fmt.Println("got int: " + strconv.Itoa(i))
 			return i, "", nil, VAL_INT
 		} else {
 			valStruct := ValueStruct{}
-			err := json.Unmarshal(p.Value, &valStruct)
+			err := json.Unmarshal(Value, &valStruct)
 			if err != nil {
-				fmt.Println("got string", string(p.Value))
-				return 0, string(p.Value), nil, VAL_STRING
+				fmt.Println("got string", string(Value))
+				return 0, string(Value), nil, VAL_STRING
 			} else {
 				fmt.Println("got struct", valStruct)
 				return 0, "", &valStruct, VAL_STRUCT
