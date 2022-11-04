@@ -213,6 +213,8 @@ func VoicebotUserIntent(c echo.Context) error {
 		ssmlText := prefix + `Ok , Let me transfer your call to an agent. Transferring call now.` + postfix
 		resp = ivrRest.CreateWelcomeVoiceBot(ssmlText)
 	case "nlu_fallback":
+		ssmlText := prefix + `I don't understand can you please say that again?` + postfix
+		resp = ivrRest.CreateWelcomeVoiceBot(ssmlText)
 	default:
 		ssmlText := prefix + `I don't understand can you please say that again?` + postfix
 		resp = ivrRest.CreateWelcomeVoiceBot(ssmlText)
