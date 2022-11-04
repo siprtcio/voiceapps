@@ -189,6 +189,10 @@ func VoicebotUserIntent(c echo.Context) error {
 				ssmlText = prefix + `I would like to confirm that you need booking for ` + userIntent.Entities[0].Text + `, and do you need booking today, tomorrow or day after tomorrow?` + postfix
 			}
 		}
+
+		if len(ssmlText) == 0 {
+			ssmlText = prefix + `I'm sorry, I don't understand, can you please say that again?` + postfix
+		}
 		resp = ivrRest.CreateWelcomeVoiceBot(ssmlText)
 
 	case "booking_with_count_time":
