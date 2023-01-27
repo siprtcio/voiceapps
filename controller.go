@@ -29,20 +29,18 @@ func DirectCall(c echo.Context) error {
 }
 
 /*
-
 Welcome to the voxvalley technologies Press 1 for sales Press 2 for support
 
 1. forward call to suren
 2. forward call to naresh.
-
 */
-func VoxvellyDemo(c echo.Context) error {
-	actionURL := "https://demo.siprtc.io/SiprtcApplications/VoxvellyDemoDtmfReceived"
+func DtmfDemo(c echo.Context) error {
+	actionURL := "https://demo.siprtc.io/SiprtcApplications/DtmfDemoDtmfReceived"
 	resp := CreateGatherSayResponse("Welcome to the voxvalley technologies. Press 1 for sales, Press 2 for support.", actionURL, "1")
 	return c.XML(http.StatusOK, resp)
 }
 
-func VoxvellyDemoDtmfReceived(c echo.Context) error {
+func DtmfDemoDtmfReceived(c echo.Context) error {
 	var resp *Response
 
 	u := StatusCallback{}
@@ -66,9 +64,9 @@ func VoxvellyDemoDtmfReceived(c echo.Context) error {
 	}
 
 	if u.Digits == "1" {
-		resp = CreateSayDial("Forwarding call to sales", "919945073606", "+917901629776")
+		resp = CreateSayDial("Forwarding call to sales", "91XXXXXXXXXX", "+91XXXXXXXXXX")
 	} else {
-		resp = CreateSayDial("Forwarding call to support", "919036950678", "+917901629776")
+		resp = CreateSayDial("Forwarding call to support", "91XXXXXXXXXX", "+91XXXXXXXXXX")
 	}
 
 	return c.XML(http.StatusOK, resp)

@@ -24,9 +24,9 @@ func main() {
 		return c.String(http.StatusOK, "Healthy!!!")
 	})
 
-	// Voxvelly basic DTMF and Call fowarding demo
-	e.POST("/SiprtcApplications/VoxvellyDemo", VoxvellyDemo)
-	e.POST("/SiprtcApplications/VoxvellyDemoDtmfReceived", VoxvellyDemoDtmfReceived)
+	// Dtmf basic DTMF and Call fowarding demo
+	e.POST("/SiprtcApplications/DtmfDemo", DtmfDemo)
+	e.POST("/SiprtcApplications/DtmfDemoDtmfReceived", DtmfDemoDtmfReceived)
 
 	// Directcall application demo
 	e.POST("/SiprtcApplications/DirectCall", DirectCall)
