@@ -12,7 +12,7 @@ var samplexml = []byte(`<?xml version="1.0"?>
 <Application>
 <Node nodeId="1" nodeType="gather" >
 <Condition></Condition>
-<Response><Gather action="https://demo.siprtc.io/SiprtcApplications/DtmfDemoDtmfReceived" method="POST" finishOnKey="#" numDigits="1"><Say>Welcome to the voxvalley technologies. Press 1 for sales, Press 2 for support.</Say></Gather><Say>We didn&#39;t receive any input. Goodbye!</Say></Response>
+<Response><Gather action="https://demo.siprtc.io/SiprtcApplications/DtmfDemoDtmfReceived" method="POST" finishOnKey="#" numDigits="1"><Say>Welcome to the apple technologies. Press 1 for sales, Press 2 for support.</Say></Gather><Say>We didn&#39;t receive any input. Goodbye!</Say></Response>
 <ChildrenNodes>
 <Node nodeId="2" nodeType="sayDial">
 <Condition condtionType="dtmf">

@@ -29,14 +29,14 @@ func DirectCall(c echo.Context) error {
 }
 
 /*
-Welcome to the voxvalley technologies Press 1 for sales Press 2 for support
+Welcome to the apple technologies Press 1 for sales Press 2 for support
 
 1. forward call to suren
 2. forward call to naresh.
 */
 func DtmfDemo(c echo.Context) error {
 	actionURL := "https://demo.siprtc.io/SiprtcApplications/DtmfDemoDtmfReceived"
-	resp := CreateGatherSayResponse("Welcome to the voxvalley technologies. Press 1 for sales, Press 2 for support.", actionURL, "1")
+	resp := CreateGatherSayResponse("Welcome to the apple technologies. Press 1 for sales, Press 2 for support.", actionURL, "1")
 	return c.XML(http.StatusOK, resp)
 }
 
