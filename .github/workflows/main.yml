@@ -714,7 +714,7 @@ jobs:
           fi
 
 
-          ECR_TAG="${SAFE_BRANCH}-${BUILD_NUMBER}"
+          ECR_TAG="${BUILD_NUMBER}"
 
 
           echo "ecr_tag=${ECR_TAG}" >> "$GITHUB_OUTPUT"
